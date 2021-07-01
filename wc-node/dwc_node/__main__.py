@@ -34,7 +34,7 @@ def main(bootstrap):
 
         print(wc_out)
 
-        producer.send("results", wc_out)
+        producer.send(chunk["command_id"], wc_out)
 
 
 

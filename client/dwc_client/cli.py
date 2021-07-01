@@ -54,7 +54,7 @@ def dwc(words: bool, file: Tuple[str, ...]):
 
     def watch_results():
         for result in kafka.consume(
-            "results",
+            command_id,
             bootstraps=config["kafka-bootstraps"],
             deserializer=lambda x: x,
         ):
