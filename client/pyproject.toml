@@ -9,6 +9,7 @@ license = "GPL"
 python = "^3.8"
 kafka-python = "^2.0.2"
 click = "^8.0.1"
+PyYAML = "^5.4.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.4"
