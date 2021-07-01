@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "dwc-client"
+version = "0.1.0"
+description = "Client for the `dwc` distributed word count program."
+authors = ["Blake Smith <blakeinvictoria@gmail.com>"]
+license = "GPL"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+kafka-python = "^2.0.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.4"
+pytest-sugar = "^0.9.4"
+pytest-instafail = "^0.4.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
