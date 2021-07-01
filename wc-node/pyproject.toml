@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "dwc-node"
+version = "0.1.0"
+description = "Word count node for distributed word count"
+authors = ["Blake Smith <blakeinvictoria@gmail.com>"]
+license = "GPL"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+kafka-python = "^2.0.2"
+PyYAML = "^5.4.1"
+click = "^8.0.1"
+
+[tool.poetry.dev-dependencies]
+
+
+[tool.poetry.scripts]
+dwc-node = "dwc_node.__main__:main"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

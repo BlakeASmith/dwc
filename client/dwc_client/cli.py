@@ -1,8 +1,10 @@
 import os.path
 import yaml
+import time
 import click
 import glob
 import uuid
+import multiprocessing as mp
 from typing import Tuple
 from pathlib import Path
 
@@ -32,6 +34,11 @@ def dwc(words: bool, file: Tuple[str, ...]):
 
     If no file is given, standard input will be used.
     """
+    wc_args = []
+
+    if words:
+        wc_args.append("-w")
+
     config = yaml.safe_load(default_config_path.read_text())
 
     produce_from = kafka.produce(
@@ -45,15 +52,22 @@ def dwc(words: bool, file: Tuple[str, ...]):
 
     command_id = uuid.uuid1().hex
 
+    def watch_results():
+        for result in kafka.consume(
+            "results",
+            bootstraps=config["kafka-bootstraps"],
+            deserializer=lambda x: x,
+        ):
+            print(result)
+
+    watch_results_process = mp.Process(target=watch_results)
+    watch_results_process.start()
+
+    time.sleep(0.5)
+
     for record in produce_from(
-        chunking.chunk_by_file(command_id, files)
+        chunking.chunk_by_file(command_id, wc_args, files)
     ):
         record.get()
 
-    for result in kafka.consume(
-        command_id,
-        bootstraps=config["kafka-bootstraps"],
-        deserializer=WordCount.deserialize,
-    ):
-        print(result)
-
+    watch_results_process.join()
