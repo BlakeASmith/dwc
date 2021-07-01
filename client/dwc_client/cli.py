@@ -1,9 +1,13 @@
+import os.path
 import yaml
 import click
-from typing import List
+import glob
+import uuid
+from typing import Tuple
 from pathlib import Path
 
-from . import kafka
+from . import kafka, chunking
+from .counting import WordCount
 
 default_config_path = Path(__file__).parent/"config.yml"
 
@@ -12,10 +16,6 @@ default_config_path = Path(__file__).parent/"config.yml"
     help="Print the word counts.",
     is_flag=True,
 )
-@click.option(
-    "-r", "--recursive",
-    help="Read all files within directories, recursively."
-)
 @click.argument(
     "file",
     nargs=-1, # Unlimited number of file arguments
@@ -23,7 +23,7 @@ default_config_path = Path(__file__).parent/"config.yml"
     type=click.Path(),
 )
 @click.command()
-def dwc(words: bool, file: List[str], recursive: bool):
+def dwc(words: bool, file: Tuple[str, ...]):
     """
     A distributed version of the unix wc utility.
 
@@ -34,12 +34,26 @@ def dwc(words: bool, file: List[str], recursive: bool):
     """
     config = yaml.safe_load(default_config_path.read_text())
 
-    produce = kafka.produce(
+    produce_from = kafka.produce(
         topic="chunks",
         bootstraps=config["kafka-bootstraps"],
     )
 
-    for future in produce(
-        ("foobar", {}) for _ in range(100)
+    files = (p for path in file 
+             for p in glob.glob(path)
+             if not os.path.isdir(p))
+
+    command_id = uuid.uuid1().hex
+
+    for record in produce_from(
+        chunking.chunk_by_file(command_id, files)
     ):
-        print(future.get())
+        record.get()
+
+    for result in kafka.consume(
+        command_id,
+        bootstraps=config["kafka-bootstraps"],
+        deserializer=WordCount.deserialize,
+    ):
+        print(result)
+
