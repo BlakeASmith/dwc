@@ -8,11 +8,15 @@ license = "GPL"
 [tool.poetry.dependencies]
 python = "^3.8"
 kafka-python = "^2.0.2"
+click = "^8.0.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.4"
 pytest-sugar = "^0.9.4"
 pytest-instafail = "^0.4.2"
+
+[tool.poetry.scripts]
+dwc = "dwc_client.cli:dwc"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
