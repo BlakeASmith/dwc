@@ -25,6 +25,11 @@ from dask.distributed import Client
     help="Print the line counts.",
     is_flag=True,
 )
+@click.option(
+    "-a", "--address",
+    help="Address of a dask scheduler. A multiprocess scheduler is used by default.",
+    default=None,
+)
 @click.argument(
     "file",
     nargs=-1, # Unlimited number of file arguments
@@ -32,7 +37,7 @@ from dask.distributed import Client
     type=click.Path(),
 )
 @click.command()
-def dwc(words: bool, bytes: bool, lines: bool, file: Tuple[str, ...]):
+def dwc(words: bool, bytes: bool, lines: bool, address: str, file: Tuple[str, ...]):
     """
     A distributed version of the unix wc utility.
 
@@ -41,11 +46,15 @@ def dwc(words: bool, bytes: bool, lines: bool, file: Tuple[str, ...]):
 
     If no file is given, standard input will be used.
     """
+    if not words and not bytes and not lines:
+        words = bytes = lines = True
+
     files = list(Path(p) for path in file 
              for p in glob.glob(path)
              if not os.path.isdir(p))
 
-    client = Client()
+    if address is not None:
+        client = Client(address)
 
     bags = dask.bag.from_sequence(files).map(dask.bag.read_text)
 
