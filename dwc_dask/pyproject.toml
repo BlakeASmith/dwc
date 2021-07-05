@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "dwc_dask"
+version = "0.1.0"
+description = "Distributed wordcount using dask."
+authors = ["Blake Smith <blakeinvictoria@gmail.com>"]
+license = "GPL"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+dask = {extras = ["complete"], version = "^2021.6.2"}
+click = "^8.0.1"
+streamz = "^0.6.2"
+graphviz = "^0.16"
+tabulate = "^0.8.9"
+
+[tool.poetry.dev-dependencies]
+
+[tool.poetry.scripts]
+dwc = "dwc_dask.client:dwc"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
