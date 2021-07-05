@@ -1,2 +1,0 @@
-kafka-bootstraps:
-  - 'localhost:9092'
